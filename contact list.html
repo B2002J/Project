@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Contact list</title>
+        <script srcscript src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h2>CONTACT LIST</h2>
+        <div class="details">
+            <label>Name:- </label>
+            <input id="Name" type="txt" placeholder="Enter Your Name" required>
+            <input id="txtId" type="hidden">
+            <label>Contact Number:- </label>
+            <input id="Contact" data-type="number" type="txt" minlength="10" maxlength="10" placeholder="Enter Contact No" required>
+            <label>Age:- </label>
+            <input id="Age" type="number" placeholder="Enter Your Age" required>
+
+            <button type="button" id="btnSave">Save</button>
+            <button type="button" id="btnClear">Clear</button>
+        </div>
+        <!--div class="table"-->
+        <div>
+            <table border="1" id="tblData">
+            <thead>
+                <tr>
+                    <th>Sr No</th>
+                    <th>Name</th>
+                    <th>Phone Number</th>
+                    <th>Age</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            </table>
+        </div>
+    <script>
+        let emptyRow=`<tr><td colspan='5'>No Contact Details</td></tr>`;
+        $(document).ready(function(){
+            loadDataFromLocal();
+            $('#tblData').on('click','.btn-edit',function() {
+                debugger;
+                const name= $(this).parent().parent().find(".Name").html();
+                const contact= $(this).parent().parent().find(".Contact").html();
+                const age= $(this).parent().parent().find(".Age").html();
+                const id = $(this).parent().parent().find(".Name").attr("data-id");
+                $("#Name").val(name);
+                $("#Contact").val(contact);
+                $("#Age").val(age);
+                $('#txtId').val(id);
+                $("#btnSave").val("Update");
+            });
+
+            $('#tblData').on('click','.btn-delete',function(){
+                debugger;
+                const id= $(this).parent().parent().find(".Name").attr("data-id");
+                deleteDataFromLocal(id);
+            });
+
+            $('#btnSave').click(function(){
+                debugger;
+                if($("#txtId").val()==''){
+                    addDataToLocal();
+                }else{
+                    updateDataFromLocal();
+                }
+            });
+
+            $("btnClear").click(function(){
+                debugger;
+                clearForm();
+            });
+            
+
+            
+        });
+        function clearForm()  {
+                debugger;
+                $("#Name").val("");
+                $("#Contact").val("");
+                $("#Age").val("");
+                $("#btnSave").val("Add");
+            }
+
+            function addEmptyRow(){
+                debugger;
+                if($("#tblData tbody").children().children().length==0){
+                    $("tblData tbody").append(emptyRow);
+                }
+            }
+
+            function loadDataFromLocal(){
+                debugger;
+                let localData = localStorage.getItem('localData');
+                if (localData){
+                    $("#tblData tbody").html("");
+                    let localArray = JSON.parse(localData);
+                    let index = 1;
+                    localArray.forEach(element => {
+                    let dynamicTR = "<tr>";
+                    dynamicTR = dynamicTR + "<td> " + index + "</td>";
+                    dynamicTR = dynamicTR + "<td class='Name'  data-id=" + element.id + ">" + element.name + "</td>";
+                    dynamicTR = dynamicTR + "<td class='Contact'>" + element.contact + "</td>";
+                    dynamicTR = dynamicTR + "<td class='Age'>" + element.age + "</td>";
+                    dynamicTR = dynamicTR + "    <td class='tdAction text-center'>";
+                    dynamicTR = dynamicTR + "        <button class='btn btn-sm btn-success btn-edit'> Edit</button>";
+                    dynamicTR = dynamicTR + "        <button class='btn btn-sm btn-danger btn-delete'> Delete</button>";
+                    dynamicTR = dynamicTR + "    </td>";
+                    dynamicTR = dynamicTR + " </tr>";
+                    $("#tblData tbody").append(dynamicTR);
+                    index++;
+                });
+            }
+            addEmptyRow();
+            }
+
+            function addDataToLocal() {
+                debugger;
+                let localData = localStorage.getItem('localData');
+                if (localData) {
+                let localArray = JSON.parse(localData);
+                const obj = {
+                id: localArray.length + 1,
+                name: $("#Name").val(),
+                contact: $("#Contact").val(),
+                age: $("#Age").val()
+                };
+                localArray.push(obj);
+                localStorage.setItem('localData', JSON.stringify(localArray));
+                loadDataFromLocal();
+                } else {
+                const arryObj = [];
+                const obj = {
+                id: 1,
+                name: $("#Name").val(),
+                contact: $("#Contact").val(),
+                age: $("#Age").val()
+                };
+                arryObj.push(obj);
+                localStorage.setItem('localData', JSON.stringify(arryObj));
+                loadDataFromLocal();
+                }
+      clearForm();
+    }
+    function updateDataFromLocal() {
+      debugger;
+      let localData = localStorage.getItem('localData');
+      let localArray = JSON.parse(localData);
+      const oldRecord = localArray.find(m => m.id == $("#txtId").val());
+      oldRecord.name = $("#Name").val();
+      oldRecord.contact = $("#Contact").val();
+      oldRecord.address = $("#Age").val();
+      localStorage.setItem('localData', JSON.stringify(localArray));
+      loadDataFromLocal();
+      clearForm();
+    }
+
+    function deleteDataFromLocal(id) {
+      debugger;
+      let localData = localStorage.getItem('localData');
+      let localArray = JSON.parse(localData);
+      let i = 0;
+      while (i < localArray.length) {
+        if (localArray[i].id === Number(id)) {
+          localArray.splice(i, 1);
+        } else {
+          ++i;
+        }
+      }
+      localStorage.setItem('localData', JSON.stringify(localArray));
+      loadDataFromLocal();
+    }
+    </script>
+    </body>
+</html>
